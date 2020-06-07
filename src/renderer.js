@@ -176,7 +176,7 @@ const iconv = require('iconv-lite');
     }
 
     function decodeLoginData(b64) {
-        const asn1 = forge.asn1.fromDer(forge.util.decode64(b64));
+        const asn1 = forge.asn1.fromDer(forge.util.decode64(b64), false);
         return {
             iv: asn1.value[1].value[1].value,
             data: asn1.value[2].value
@@ -196,13 +196,13 @@ const iconv = require('iconv-lite');
         if (metaData && metaData.length && metaData[0].values && metaData[0].values.length) {
             const globalSalt = toByteString(metaData[0].values[0][0].buffer);
             const item2 = toByteString(metaData[0].values[0][1].buffer);
-            const item2Asn1 = forge.asn1.fromDer(item2);
+            const item2Asn1 = forge.asn1.fromDer(item2, false);
             const item2Value = pbesDecrypt(item2Asn1.value, masterPasswordBytes, globalSalt);
             if (item2Value && item2Value.data === 'password-check') {
                 const nssData = key4Db.exec('SELECT a11 FROM nssPrivate WHERE a11 IS NOT NULL;');
                 if (nssData && nssData.length && nssData[0].values && nssData[0].values.length) {
                     const a11 = toByteString(nssData[0].values[0][0].buffer);
-                    const a11Asn1 = forge.asn1.fromDer(a11);
+                    const a11Asn1 = forge.asn1.fromDer(a11, false);
                     return pbesDecrypt(a11Asn1.value, masterPasswordBytes, globalSalt);
                 }
             } else {
